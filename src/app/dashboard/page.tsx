@@ -5,8 +5,20 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Mic, Plus, Phone, Zap, BarChart3, Settings, LogOut, Bot, Clock, PhoneCall } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
-import { supabase } from '@/lib/supabase'
-import { Agent } from '@/types/database'
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+)
+
+interface Agent {
+  id: string
+  name: string
+  status: string
+  phone_number?: string
+  minutes_used?: number
+}
 
 export default function DashboardPage() {
   const router = useRouter()
@@ -41,12 +53,12 @@ export default function DashboardPage() {
       .order('created_at', { ascending: false })
 
     if (agentsData) {
-      setAgents(agentsData)
+      setAgents(agentsData as Agent[])
       setStats({
         totalAgents: agentsData.length,
-        activeAgents: agentsData.filter(a => a.status === 'active').length,
-        totalCalls: 0, // Will be populated from calls
-        totalMinutes: agentsData.reduce((sum, a) => sum + (a.minutes_used || 0), 0),
+        activeAgents: (agentsData as Agent[]).filter(a => a.status === 'active').length,
+        totalCalls: 0,
+        totalMinutes: (agentsData as Agent[]).reduce((sum, a) => sum + (a.minutes_used || 0), 0),
       })
     }
 

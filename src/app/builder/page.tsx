@@ -1,10 +1,10 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { Mic, Phone, Mail, MessageSquare, Calendar, ArrowLeft, Rocket, Settings, CheckCircle } from 'lucide-react'
 
-export default function BuilderPage() {
+function BuilderContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const [config, setConfig] = useState<any>(null)
@@ -133,5 +133,17 @@ export default function BuilderPage() {
         </div>
       </main>
     </div>
+  )
+}
+
+export default function BuilderPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-950 flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-primary-500 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    }>
+      <BuilderContent />
+    </Suspense>
   )
 }
